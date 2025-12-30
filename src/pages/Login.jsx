@@ -147,13 +147,12 @@ const Login = () => {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>Google Sheet ID</label>
+                        <label>Google Sheet ID (Optional for Demo)</label>
                         <input
                             type="text"
                             value={formData.sheetId}
                             onChange={(e) => setFormData({ ...formData, sheetId: e.target.value })}
                             placeholder="Paste your Google Sheet ID here"
-                            required
                         />
                     </div>
 
