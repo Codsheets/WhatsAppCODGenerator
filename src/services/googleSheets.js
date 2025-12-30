@@ -114,18 +114,18 @@ async function callAppsScript(method, params) {
  * Authenticate user against Users sheet
  */
 export const authenticateUser = async (username, password, sheetId) => {
-    await delay(500);
+    if (isConfigured()) {
+        try {
+            const users = await fetchUsers(sheetId);
+            const user = users.find(u => u.Username === username && u.Password === password);
 
-    if (!USE_MOCK_DATA) {
-        // Fetch users from Google Sheets
-        const users = await fetchUsers(sheetId);
-        const user = users.find(u => u.Username === username && u.Password === password);
-
-        if (user) {
-            const { Password, ...userWithoutPassword } = user;
-            return userWithoutPassword;
+            if (user) {
+                const { Password, ...userWithoutPassword } = user;
+                return userWithoutPassword;
+            }
+        } catch (error) {
+            console.error('Error authenticating user:', error);
         }
-        return null;
     }
 
     // Fallback to mock data
@@ -164,9 +164,7 @@ export const fetchClients = async (sheetId = null) => {
  * Add new client to Google Sheets
  */
 export const addClient = async (client, sheetId = null) => {
-    await delay(500);
-
-    if (!USE_MOCK_DATA) {
+    if (isConfigured()) {
         try {
             await callAppsScript('POST', {
                 action: 'create',
@@ -174,15 +172,14 @@ export const addClient = async (client, sheetId = null) => {
                 data: client
             });
             console.log('Client added to Google Sheets');
-            return true;
         } catch (error) {
             console.error('Error adding client:', error);
         }
     }
 
-    // Also update mock data for immediate UI feedback
+    // Also update mock data for immediate UI feedback or fallback
     MOCK_DATA.clients.push(client);
-    console.log('Added client:', client);
+    console.log('Added client to local state:', client);
     return true;
 };
 
@@ -190,9 +187,7 @@ export const addClient = async (client, sheetId = null) => {
  * Update existing client in Google Sheets
  */
 export const updateClient = async (clientIndex, updates, sheetId = null) => {
-    await delay(500);
-
-    if (!USE_MOCK_DATA) {
+    if (isConfigured()) {
         try {
             await callAppsScript('POST', {
                 action: 'update',
@@ -209,7 +204,6 @@ export const updateClient = async (clientIndex, updates, sheetId = null) => {
     // Also update mock data
     if (clientIndex >= 0 && clientIndex < MOCK_DATA.clients.length) {
         Object.assign(MOCK_DATA.clients[clientIndex], updates);
-        console.log('Updated client at index:', clientIndex, updates);
         return true;
     }
 
@@ -220,9 +214,7 @@ export const updateClient = async (clientIndex, updates, sheetId = null) => {
  * Delete client from Google Sheets
  */
 export const deleteClient = async (clientIndex, sheetId = null) => {
-    await delay(500);
-
-    if (!USE_MOCK_DATA) {
+    if (isConfigured()) {
         try {
             await callAppsScript('POST', {
                 action: 'delete',
@@ -238,7 +230,6 @@ export const deleteClient = async (clientIndex, sheetId = null) => {
     // Also update mock data
     if (clientIndex >= 0 && clientIndex < MOCK_DATA.clients.length) {
         const deleted = MOCK_DATA.clients.splice(clientIndex, 1);
-        console.log('Deleted client:', deleted[0]);
         return true;
     }
 
@@ -253,12 +244,12 @@ export const deleteClient = async (clientIndex, sheetId = null) => {
  * Fetch users from Google Sheets
  */
 export const fetchUsers = async (sheetId = null) => {
-    await delay(500);
-
-    if (!USE_MOCK_DATA) {
+    if (isConfigured()) {
         try {
-            await callAppsScript('GET', { action: 'fetch', sheet: 'Users' });
-            console.log('Fetching users from Google Sheets...');
+            const response = await callAppsScript('GET', { action: 'fetch', sheet: 'Users' });
+            if (response && response.success && response.data) {
+                return response.data;
+            }
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -301,9 +292,7 @@ export const fetchCredentials = async (sheetId = null) => {
  * Save a credential to Google Sheets
  */
 export const saveCredential = async (key, value, sheetId = null) => {
-    await delay(500);
-
-    if (!USE_MOCK_DATA) {
+    if (isConfigured()) {
         try {
             await callAppsScript('POST', {
                 action: 'updateKey',
@@ -325,6 +314,5 @@ export const saveCredential = async (key, value, sheetId = null) => {
         MOCK_DATA.keys.push({ Key: key, Value: value });
     }
 
-    console.log(`Saved ${key}: ${value}`);
     return true;
 };
