@@ -1,0 +1,136 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.kpi {
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconBox {
+    width: 40px;
+    height: 40px;
+    background: var(--success);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.kpi h4 {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.kpi span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.addBtn {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tableContainer {
+    padding: 0;
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 1.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-bottom: var(--glass-border);
+}
+
+.table td {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.agentCell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.agentAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #475569;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.agentName {
+    font-weight: 600;
+}
+
+.agentUser {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.badge {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--accent-color);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.performance {
+    width: 100px;
+}
+
+.bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.fill {
+    background: var(--success);
+    height: 100%;
+}
+
+.activeDot {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--success);
+    font-size: 0.9rem;
+}
+
+.activeDot::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+}
