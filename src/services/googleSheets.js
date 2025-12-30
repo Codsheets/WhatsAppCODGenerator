@@ -75,7 +75,6 @@ async function callAppsScript(method, params) {
         const fetchOptions = {
             method: method,
             headers: {},
-            // mode: 'cors' is default, Apps Script handles it with ContentService
         };
 
         let targetUrl = url;
@@ -90,13 +89,10 @@ async function callAppsScript(method, params) {
 
         const response = await fetch(targetUrl, fetchOptions);
 
-        // Note: For Apps Script, redirects are common. Fetch handles them.
-        // If the script returns JSON via ContentService, we can read it.
         try {
             const result = await response.json();
             return result;
         } catch (e) {
-            // If response is not JSON (e.g. redirect or error HTML)
             return { success: true, note: 'Request processed' };
         }
 
@@ -156,7 +152,6 @@ export const fetchClients = async (sheetId = null) => {
         }
     }
 
-    // Fallback to mock data for demo if not configured
     return normalizePhoneBatch([...MOCK_DATA.clients], 'Phone', '212');
 };
 
@@ -177,9 +172,7 @@ export const addClient = async (client, sheetId = null) => {
         }
     }
 
-    // Also update mock data for immediate UI feedback or fallback
     MOCK_DATA.clients.push(client);
-    console.log('Added client to local state:', client);
     return true;
 };
 
@@ -201,7 +194,6 @@ export const updateClient = async (clientIndex, updates, sheetId = null) => {
         }
     }
 
-    // Also update mock data
     if (clientIndex >= 0 && clientIndex < MOCK_DATA.clients.length) {
         Object.assign(MOCK_DATA.clients[clientIndex], updates);
         return true;
@@ -227,9 +219,8 @@ export const deleteClient = async (clientIndex, sheetId = null) => {
         }
     }
 
-    // Also update mock data
     if (clientIndex >= 0 && clientIndex < MOCK_DATA.clients.length) {
-        const deleted = MOCK_DATA.clients.splice(clientIndex, 1);
+        MOCK_DATA.clients.splice(clientIndex, 1);
         return true;
     }
 
@@ -306,7 +297,6 @@ export const saveCredential = async (key, value, sheetId = null) => {
         }
     }
 
-    // Also update mock data
     const existingKey = MOCK_DATA.keys.find(item => item.Key === key);
     if (existingKey) {
         existingKey.Value = value;
