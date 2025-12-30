@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { fetchClients, fetchCredentials } from '../services/googleSheets';
+import { sendWhatsAppMessage } from '../services/whatsapp';
 import { generateMessage } from '../services/ai';
 import {
     Send, Users, Filter, Sparkles, MessageCircle, Clock,
@@ -63,20 +63,35 @@ const WhatsApp = () => {
     };
 
     const handleSendCampaign = async () => {
+        if (!credentials.whatsapp_access_token || !credentials.whatsapp_phone_id) {
+            alert('Please configure WhatsApp API credentials in the Integration page first.');
+            return;
+        }
+
         setSending(true);
         setSentCount(0);
+        let successCount = 0;
+        let errorCount = 0;
 
-        // Simulate sending to each client
         for (let i = 0; i < filteredClients.length; i++) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            setSentCount(i + 1);
+            const client = filteredClients[i];
+            const personalizedMsg = personalizeMessage(message, client);
 
-            // TODO: Replace with real WhatsApp API call
-            // await sendWhatsAppMessage(filteredClients[i].Phone, personalizeMessage(message, filteredClients[i]));
+            try {
+                await sendWhatsAppMessage(client.Phone, personalizedMsg, credentials);
+                successCount++;
+            } catch (error) {
+                console.error(`Failed to send to ${client.Client}:`, error);
+                errorCount++;
+            }
+
+            setSentCount(i + 1);
+            // Throttle to avoid rate limits
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         setSending(false);
-        alert(`Campaign sent to ${filteredClients.length} clients!`);
+        alert(`Campaign complete!\nSuccess: ${successCount}\nErrors: ${errorCount}`);
     };
 
     const personalizeMessage = (template, client) => {
