@@ -1,0 +1,483 @@
+.container {
+    padding: 0;
+    width: 100%;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.leftActions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex: 1;
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    flex: 1;
+    max-width: 400px;
+}
+
+.searchBar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--text-primary);
+}
+
+.searchBar input::placeholder {
+    color: var(--text-secondary);
+}
+
+.viewToggle {
+    display: flex;
+    background: var(--bg-glass);
+    border: var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem;
+}
+
+.viewBtn {
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.viewBtn.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+.filterBtn,
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+}
+
+.addBtn {
+    background: var(--accent-color);
+}
+
+/* Card View */
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.clientCard {
+    position: relative;
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.clientCard:hover {
+    transform: translateY(-8px) rotateX(2deg);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.clientCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--radius-lg);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: -1;
+}
+
+.clientCard:hover::before {
+    opacity: 1;
+}
+
+/* Status-based colors */
+.clientCard[data-status="confirmed"]::before {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+}
+
+.clientCard[data-status="cancelled"]::before {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.05));
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+}
+
+.clientCard[data-status="delivered"]::before {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+.clientCard[data-status="shipped"]::before {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+}
+
+.clientCard[data-status="returned"]::before {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--accent-color), #ec4899);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.cardActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.actionBtn {
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actionBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.actionBtn.delete:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+.actionBtn.edit:hover {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+.infoRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.infoRow svg {
+    flex-shrink: 0;
+}
+
+.statusBadge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    text-transform: capitalize;
+}
+
+.statusBadge[data-status="confirmed"] {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.statusBadge[data-status="cancelled"] {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.statusBadge[data-status="delivered"] {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.statusBadge[data-status="shipped"] {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.statusBadge[data-status="returned"] {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* List View */
+.listView {
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--backdrop-blur));
+    border: var(--glass-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table thead {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}
+
+.table tbody tr {
+    transition: background 0.3s;
+}
+
+.table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.clientName {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.smallAvatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent-color), #ec4899);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.clientInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.clientInfo strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.clientInfo small {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s;
+}
+
+.modal {
+    background: var(--bg-card);
+    border: var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.closeBtn:hover {
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.formGroup label {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.formGroup textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modalActions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: flex-end;
+}
+
+.cancelBtn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.cancelBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.saveBtn {
+    background: var(--accent-color);
+}
+
+.deleteConfirm {
+    text-align: center;
+}
+
+.deleteConfirm p {
+    color: var(--text-secondary);
+    margin: 1rem 0;
+}
+
+.deleteConfirm strong {
+    color: var(--text-primary);
+}
+
+.dangerBtn {
+    background: var(--danger);
+}
+
+.dangerBtn:hover {
+    background: #dc2626;
+}
