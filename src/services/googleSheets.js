@@ -11,11 +11,14 @@ import { normalizePhoneBatch } from '../utils/phoneFormatter';
  * Or set it in localStorage: localStorage.setItem('appsScriptUrl', 'YOUR_URL')
  */
 const getAppsScriptUrl = () => {
-    return localStorage.getItem('appsScriptUrl') || 'YOUR_DEPLOYMENT_URL_HERE';
+    return localStorage.getItem('appsScriptUrl') || '';
 };
 
-// Set to true to use mock data (for development without Apps Script)
-const USE_MOCK_DATA = getAppsScriptUrl() === 'YOUR_DEPLOYMENT_URL_HERE';
+// Set to true to use mock data only if URL is not set
+const isConfigured = () => {
+    const url = getAppsScriptUrl();
+    return url && url !== 'YOUR_DEPLOYMENT_URL_HERE' && url.startsWith('https://script.google.com');
+};
 
 // Simulate async delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -62,33 +65,40 @@ const MOCK_DATA = {
  * Make API call to Google Apps Script
  */
 async function callAppsScript(method, params) {
-    if (USE_MOCK_DATA) {
-        console.warn('Using mock data. Deploy Apps Script and update APPS_SCRIPT_URL to use real data.');
+    const url = getAppsScriptUrl();
+    if (!isConfigured()) {
+        console.warn('Google Apps Script URL is not configured. Go to Integration page to set it.');
         return null;
     }
 
     try {
-        const options = {
+        const fetchOptions = {
             method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            mode: 'no-cors', // Apps Script doesn't support CORS, but it still works
+            headers: {},
+            // mode: 'cors' is default, Apps Script handles it with ContentService
         };
 
+        let targetUrl = url;
+
         if (method === 'POST') {
-            options.body = JSON.stringify(params);
+            fetchOptions.method = 'POST';
+            fetchOptions.body = JSON.stringify(params);
+        } else {
+            const searchParams = new URLSearchParams(params);
+            targetUrl = `${url}?${searchParams.toString()}`;
         }
 
-        const url = method === 'GET'
-            ? `${APPS_SCRIPT_URL}?${new URLSearchParams(params)}`
-            : APPS_SCRIPT_URL;
+        const response = await fetch(targetUrl, fetchOptions);
 
-        const response = await fetch(url, options);
-
-        // Note: With no-cors, we can't read the response
-        // Apps Script will execute successfully, we just can't verify
-        return { success: true };
+        // Note: For Apps Script, redirects are common. Fetch handles them.
+        // If the script returns JSON via ContentService, we can read it.
+        try {
+            const result = await response.json();
+            return result;
+        } catch (e) {
+            // If response is not JSON (e.g. redirect or error HTML)
+            return { success: true, note: 'Request processed' };
+        }
 
     } catch (error) {
         console.error('Apps Script API Error:', error);
@@ -135,22 +145,19 @@ export const authenticateUser = async (username, password, sheetId) => {
  * Fetch clients from Google Sheets
  */
 export const fetchClients = async (sheetId = null) => {
-    await delay(500);
-
-    if (!USE_MOCK_DATA) {
+    if (isConfigured()) {
         try {
-            await callAppsScript('GET', { action: 'fetch', sheet: 'Clients' });
-            // Since we can't read response with no-cors, we'll need to use a different approach
-            // For now, return mock data but log that we're trying to fetch
-            console.log('Fetching clients from Google Sheets...');
+            const response = await callAppsScript('GET', { action: 'fetch', sheet: 'Clients' });
+            if (response && response.success && response.data) {
+                return normalizePhoneBatch(response.data, 'Phone', '212');
+            }
         } catch (error) {
-            console.error('Error fetching clients:', error);
+            console.error('Error fetching clients from sheet:', error);
         }
     }
 
-    // Normalize phone numbers
-    const normalizedClients = normalizePhoneBatch([...MOCK_DATA.clients], 'Phone', '212');
-    return normalizedClients;
+    // Fallback to mock data for demo if not configured
+    return normalizePhoneBatch([...MOCK_DATA.clients], 'Phone', '212');
 };
 
 /**
@@ -268,23 +275,25 @@ export const fetchUsers = async (sheetId = null) => {
  * Fetch API keys and credentials from Google Sheets
  */
 export const fetchCredentials = async (sheetId = null) => {
-    await delay(500);
-
-    if (!USE_MOCK_DATA) {
+    if (isConfigured()) {
         try {
-            await callAppsScript('GET', { action: 'fetch', sheet: 'Keys' });
-            console.log('Fetching credentials from Google Sheets...');
+            const response = await callAppsScript('GET', { action: 'fetch', sheet: 'Keys' });
+            if (response && response.success && response.data) {
+                const credentials = {};
+                response.data.forEach(item => {
+                    credentials[item.Key] = item.Value;
+                });
+                return credentials;
+            }
         } catch (error) {
             console.error('Error fetching credentials:', error);
         }
     }
 
-    // Convert array of {Key, Value} to object
     const credentials = {};
     MOCK_DATA.keys.forEach(item => {
         credentials[item.Key] = item.Value;
     });
-
     return credentials;
 };
 
